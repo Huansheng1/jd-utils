@@ -62,9 +62,6 @@ const JD_API_HOST = 'https://car-member.jd.com/api/';
                 $.groupCode = helpInfo[helpItem].groupCode
                 $.shareCode = helpInfo[helpItem].shareCode
                 $.activityId = helpInfo[helpItem].activityId
-                if ($.UserName === 'huansheng1') {
-                    console.log('幻生：', $)
-                }
                 if ($.UserName === helpItem) {
                     console.log(`${$.UserName}跳过助力自己`)
                     continue

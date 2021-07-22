@@ -18,7 +18,7 @@ update: 2021.7.22 16:55
 #exit(0)
 #ck ENV的 变量 JD_COOKIE='ck1&ck2' 最后才到脚本内 cookies=ck
 cookies = ''
-qjd_zlzh = ['huansheng1', 'jd_6f1e34fa02bc7', 'fmh10086']
+qjd_zlzh = ['huansheng1', 'jd_6f1e34fa02bc7', 'fmh10086','jd_4078a8160b20d','jd_60e71cb15907b']
 
 # Env环境设置 通知服务
 # export BARK=''                   # bark服务,苹果商店自行搜索;
