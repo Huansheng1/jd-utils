@@ -137,7 +137,7 @@ function getUserInfo () {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     if (safeGet(data)) {
-                        console.log('获取用户信息完毕：', data)
+                        // console.log('获取用户信息完毕：', data)
                         data = JSON.parse(data);
                         if (data.data.shareTaskRes) {
                             console.log(`\n【京东账号${$.index}（${$.nickName || $.UserName}）的${$.name}好友互助码】${data.data.shareTaskRes.itemId}\n`);
@@ -226,7 +226,7 @@ async function helpFriends () {
 //格式化助力码
 function shareCodesFormat () {
     return new Promise(async resolve => {
-        // console.log(`第${$.index}个京东账号的助力码:::${$.shareCodesArr[$.index - 1]}`)
+        console.log(`第${$.index}个京东账号的助力码:::${$.shareCodesArr[$.index - 1]}`)
         $.newShareCodes = [];
         if ($.shareCodesArr[$.index - 1]) {
             $.newShareCodes = $.shareCodesArr[$.index - 1].split('@');
