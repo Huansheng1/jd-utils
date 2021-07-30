@@ -63,25 +63,19 @@ const JD_API_HOST = `https://api.m.jd.com`;
         if (cookie) {
             $.index = i + 1;
             console.log(`\n******查询【京东账号${$.index}】红包情况\n`);
-            await getauthorid()
+            // await getauthorid()
             if (!dyjCode) {
                 console.log(`环境变量中没有检测到助力码,开始获取 账号${openred} 助力码`)
                 await open()
                 await getid()
             } else {
                 dyjStr = dyjCode.split("@")
-                try {
-                    if (dyjStr[0]) {
-                        $.rid = dyjStr[0]
-                        $.inviter = dyjStr[1]
-                    }
-                } catch (error) {
-                    console.log(`环境变量中助力码格式不正确,开始获取 账号${openred} 助力码`)
-                    await open()
-                    await getid()
+                if (dyjStr[0]) {
+                    $.rid = dyjStr[0]
+                    $.inviter = dyjStr[1]
                 }
             }
-            await help($.authorid, $.authorinviter, 1, true) //用你开包的号给我助力一次
+            // await help($.authorid, $.authorinviter, 1, true) //用你开包的号给我助力一次
         }
     }
 
@@ -108,8 +102,8 @@ const JD_API_HOST = `https://api.m.jd.com`;
             await getid()
             if ($.canDraw) {
                 console.log("检测到已可兑换")
-                await exchange()
-                await $.wait(1000)
+                await Draw()
+                //   i = 999
             }
         }
     }
@@ -148,30 +142,7 @@ function Draw () {
         });
     });
 }
-function exchange () {
-    return new Promise(async (resolve) => {
-        let options = taskUrl("exchange", `{"linkId":"${$.linkid}", "rewardType":1}`)
-        $.get(options, async (err, resp, data) => {
-            try {
-                if (err) {
-                    console.log(`${JSON.stringify(err)}`);
-                    console.log(`${$.name} API请求失败，请检查网路重试`);
-                } else {
-                    data = JSON.parse(data);
-                    if (data.success) {
-                        console.log(`【京东账号${$.index}】提现成功`)
-                    } else {
-                        console.log(`【京东账号${$.index}】提现失败`)
-                    }
-                }
-            } catch (e) {
-                $.logErr(e, resp);
-            } finally {
-                resolve();
-            }
-        });
-    });
-}
+
 
 
 function getid () {
@@ -185,23 +156,22 @@ function getid () {
                 } else {
                     data = JSON.parse(data);
                     console.log(data.data.state)
-                    if (data.data.state !== 0) {
-                        if (data.success && data.data) {
-                            if (data.data.state === 3) {
-                                console.log("今日已成功兑换")
+                    if (data.success && data.data) {
+                        if (data.data.state === 3) {
+                            console.log("今日已成功兑换")
+                            $.needhelp = false
+                        } else {
+                            if (data.data.state === 6) {
                                 $.needhelp = false
                                 $.canDraw = false
                             }
-                            if (data.data.state === 6) {
-                                $.needhelp = false
-                                $.canDraw = true
-                            }
-                        } else {
-                            console.log(`当前余额：${data.data.amount} 还需 ${data.data.needAmount} `)
+                            console.log(`获取成功redEnvelopeId： ${data.data.redEnvelopeId} \n markPin：${data.data.markedPin}`)
+                            $.rid = data.data.redEnvelopeId
+                            $.inviter = data.data.markedPin
                         }
+                        console.log(`当前余额：${data.data.amount} 还需 ${data.data.needAmount} `)
                     } else {
-                        $.canDraw = false
-                        console.log(`【京东账号${$.index}】为黑号，跳过`)
+                        console.log(data)
                     }
                 }
             } catch (e) {
@@ -273,34 +243,34 @@ function open () {
 
 
 
-function getauthorid () {
-    return new Promise(async (resolve) => {
-        let options = {
-            url: "https://cdn.jsdelivr.net/gh/Huansheng1/jd-utils@main/json/dyj.json",
-            headers: {}
-        }
-        $.get(options, async (err, resp, data) => {
-            try {
-                if (err) {
-                    console.log(`${JSON.stringify(err)}`);
-                    console.log(`${$.name} API请求失败，请检查网路重试`);
-                } else {
-                    data = JSON.parse(data);
-                    if (data) {
-                        console.log(`获取作者🐎成功 ${data.rid}`)
-                        $.authorid = data.rid
-                        $.authorinviter = data.inviter
-                    }
-                }
+// function getauthorid() {
+//     return new Promise(async (resolve) => {
+//         let options = {
+//             url: "https://cdn.jsdelivr.net/gh/jiulan/platypus@main/json/dyj.json",
+//             headers: {}
+//         }
+//         $.get(options, async (err, resp, data) => {
+//             try {
+//                 if (err) {
+//                     console.log(`${JSON.stringify(err)}`);
+//                     console.log(`${$.name} API请求失败，请检查网路重试`);
+//                 } else {
+//                     data = JSON.parse(data);
+//                     if (data) {
+//                         console.log(`获取作者🐎成功 ${data.rid}`)
+//                         $.authorid = data.rid
+//                         $.authorinviter = data.inviter
+//                     }
+//                 }
 
-            } catch (e) {
-                $.logErr(e, resp);
-            } finally {
-                resolve();
-            }
-        });
-    });
-}
+//             } catch (e) {
+//                 $.logErr(e, resp);
+//             } finally {
+//                 resolve();
+//             }
+//         });
+//     });
+// }
 
 
 
