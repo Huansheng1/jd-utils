@@ -54,22 +54,24 @@ if (openredList.length < 1) {
     }
     console.log("默认为号1开包/助力,号1为作者助力")
     message = ''
-    $.helptype = 1
-    $.needhelp = true
-    $.canDraw = false
-    $.canHelp = true;
+    for (const i of openredList.length) {
+        $['helptype' + i] = 1
+        $['needhelp' + i] = true
+        $['canDraw' + i] = false
+        $['canHelp' + i] = true;
+    }
     $.linkid = "yMVR-_QKRd2Mq27xguJG-w"
     //开包 查询
-    for (let i of openredList) {
-        cookie = cookiesArr[i - 1];
+    for (let i of openredList.length) {
+        cookie = cookiesArr[i];
         if (cookie) {
-            $.index = i;
+            $.index = i + 1;
             console.log(`\n******查询【京东账号${$.index}】红包情况\n`);
             // await getauthorid()
             if (!dyjCode) {
-                console.log(`环境变量中没有检测到助力码,开始获取 账号${i} 助力码`)
-                await open()
-                await getid()
+                console.log(`环境变量中没有检测到助力码,开始获取 账号${$.index} 助力码`)
+                await open(i)
+                await getid(i)
             } else {
                 dyjStr = dyjCode.split("@")
                 if (dyjStr[0]) {
@@ -79,34 +81,27 @@ if (openredList.length < 1) {
             }
             // await help($.authorid, $.authorinviter, 1, true) //用你开包的号给我助力一次
         }
-    }
-
-    for (let i = 0; i < cookiesArr.length && $.needhelp; i++) {
-        cookie = cookiesArr[i];
-        if (cookie) {
-            $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
-            $.index = i + 1;
-            $.isLogin = true;
-            $.message = `【京东账号${$.index}】${$.UserName}\n`
-            console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
-        }
-        if ($.rid && $.inviter && $.needhelp) {
-            await help($.rid, $.inviter, $.helptype)
-        } else {
-            console.log("没获取到助力码,停止运行")
-        }
-    }
-    for (let i of openredList) {
-        cookie = cookiesArr[i - 1];
-        if (cookie) {
-            $.index = i;
-            console.log(`\n******查询【京东账号${$.index}】红包情况\n`);
-            await getid()
-            if ($.canDraw) {
-                console.log("检测到已可兑换")
-                await Draw()
-                //   i = 999
+        for (let i = 0; i < cookiesArr.length && $['needhelp' + i]; i++) {
+            cookie = cookiesArr[i];
+            if (cookie) {
+                $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
+                $.index = i + 1;
+                $.isLogin = true;
+                $.message = `【京东账号${$.index}】${$.UserName}\n`
+                console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
             }
+            if ($.rid && $.inviter && $['needhelp' + i]) {
+                await help($.rid, $.inviter, $.helptype, i)
+            } else {
+                console.log("没获取到助力码,停止运行")
+            }
+        }
+        console.log(`\n******查询【京东账号${$.index}】红包情况\n`);
+        await getid(i)
+        if ($.canDraw) {
+            console.log("检测到已可兑换，开始兑换：")
+            await Draw(i)
+            //   i = 999
         }
     }
 
@@ -147,7 +142,7 @@ function Draw () {
 
 
 
-function getid () {
+function getid (i) {
     return new Promise(async (resolve) => {
         let options = taskUrl("redEnvelopeInteractHome", `{"linkId":"${$.linkid}","redEnvelopeId":"","inviter":"","helpType":""}`)
         $.get(options, async (err, resp, data) => {
@@ -161,12 +156,12 @@ function getid () {
                     if (data.success && data.data) {
                         if (data.data.state === 3) {
                             console.log("今日已成功兑换")
-                            $.needhelp = false
-                            $.canDraw = false
+                            $['needhelp' + i] = false
+                            $['canDraw' + i] = false
                         } else {
                             if (data.data.state === 6) {
-                                $.needhelp = false
-                                $.canDraw = false
+                                $['needhelp' + i] = false
+                                $['canDraw' + i] = false
                             }
                             console.log(`获取成功redEnvelopeId： ${data.data.redEnvelopeId} \n markPin：${data.data.markedPin}`)
                             $.rid = data.data.redEnvelopeId
@@ -188,7 +183,7 @@ function getid () {
 
 
 
-function help (rid, inviter, type, helpother) {
+function help (rid, inviter, type, i) {
     return new Promise(async (resolve) => {
         let options = taskUrl("openRedEnvelopeInteract", `{"linkId":"${$.linkid}","redEnvelopeId":"${rid}","inviter":"${inviter}","helpType":"${type}"}`)
         $.get(options, async (err, resp, data) => {
@@ -201,10 +196,10 @@ function help (rid, inviter, type, helpother) {
                     if (data.data && data.data.helpResult) {
                         console.log(JSON.stringify(data.data.helpResult))
                         if (data.data.helpResult.code === 16005 || data.data.helpResult.code === 16007) {
-                            $.needhelp = false
-                            $.canDraw = true
+                            $['needhelp' + i] = false
+                            $['canDraw' + i] = true
                         } else if (data.data.helpResult.code === 16011) {
-                            $.needhelp = false
+                            $['needhelp' + i] = false
                         }
                     } else {
                         console.log(JSON.stringify(data))
@@ -233,6 +228,7 @@ function open () {
                     console.log(`${$.name} API请求失败，请检查网路重试`);
                 } else {
                     data = JSON.parse(data);
+                    console.log('开启红包结果：', JSON.stringify(data))
                 }
 
             } catch (e) {
@@ -243,40 +239,6 @@ function open () {
         });
     });
 }
-
-
-
-// function getauthorid() {
-//     return new Promise(async (resolve) => {
-//         let options = {
-//             url: "https://cdn.jsdelivr.net/gh/jiulan/platypus@main/json/dyj.json",
-//             headers: {}
-//         }
-//         $.get(options, async (err, resp, data) => {
-//             try {
-//                 if (err) {
-//                     console.log(`${JSON.stringify(err)}`);
-//                     console.log(`${$.name} API请求失败，请检查网路重试`);
-//                 } else {
-//                     data = JSON.parse(data);
-//                     if (data) {
-//                         console.log(`获取作者🐎成功 ${data.rid}`)
-//                         $.authorid = data.rid
-//                         $.authorinviter = data.inviter
-//                     }
-//                 }
-
-//             } catch (e) {
-//                 $.logErr(e, resp);
-//             } finally {
-//                 resolve();
-//             }
-//         });
-//     });
-// }
-
-
-
 function taskUrl (function_id, body) {
     return {
         url: `${JD_API_HOST}/?functionId=${function_id}&body=${encodeURIComponent(body)}&t=${Date.now()}&appid=activities_platform&clientVersion=3.5.2`,
