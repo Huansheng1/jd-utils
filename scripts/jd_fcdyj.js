@@ -22,7 +22,7 @@ cron "1 0 * * *" script-path=https://raw.githubusercontent.com/jiulan/platypus/m
 const $ = new Env('发财大赢家');
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-const openred = $.isNode() ? (process.env.openred ? process.env.openred : 1) : 1 //选择哪个号开包
+const openred = $.isNode() ? (process.env.openred ? process.env.openred : 1) : '1,2,3,4,5' //选择哪个号开包，多个帐号用,隔开
 const dyjCode = $.isNode() ? (process.env.dyjCode ? process.env.dyjCode : null) : null //选择哪个号开包
 const randomCount = $.isNode() ? 20 : 5;
 const notify = $.isNode() ? require('./sendNotify') : '';
@@ -41,8 +41,10 @@ if ($.isNode()) {
 }
 
 const JD_API_HOST = `https://api.m.jd.com`;
-
-
+const openredList = openred.split(',');
+if (openredList.length < 1) {
+    openredList = [openred];
+}
 !(async () => {
     if (!cookiesArr[0]) {
         $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {
@@ -58,14 +60,14 @@ const JD_API_HOST = `https://api.m.jd.com`;
     $.canHelp = true;
     $.linkid = "yMVR-_QKRd2Mq27xguJG-w"
     //开包 查询
-    for (let i = openred - 1; i < openred; i++) {
-        cookie = cookiesArr[i];
+    for (let i of openredList) {
+        cookie = cookiesArr[i - 1];
         if (cookie) {
-            $.index = i + 1;
+            $.index = i;
             console.log(`\n******查询【京东账号${$.index}】红包情况\n`);
             // await getauthorid()
             if (!dyjCode) {
-                console.log(`环境变量中没有检测到助力码,开始获取 账号${openred} 助力码`)
+                console.log(`环境变量中没有检测到助力码,开始获取 账号${i} 助力码`)
                 await open()
                 await getid()
             } else {
@@ -94,10 +96,10 @@ const JD_API_HOST = `https://api.m.jd.com`;
             console.log("没获取到助力码,停止运行")
         }
     }
-    for (let i = openred - 1; i < openred; i++) {
-        cookie = cookiesArr[i];
+    for (let i of openredList) {
+        cookie = cookiesArr[i - 1];
         if (cookie) {
-            $.index = i + 1;
+            $.index = i;
             console.log(`\n******查询【京东账号${$.index}】红包情况\n`);
             await getid()
             if ($.canDraw) {
@@ -160,6 +162,7 @@ function getid () {
                         if (data.data.state === 3) {
                             console.log("今日已成功兑换")
                             $.needhelp = false
+                            $.canDraw = false
                         } else {
                             if (data.data.state === 6) {
                                 $.needhelp = false
