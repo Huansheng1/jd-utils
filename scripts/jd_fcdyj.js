@@ -54,7 +54,7 @@ if (openredList.length < 1) {
     }
     console.log("默认为号1开包/助力,号1为作者助力")
     message = ''
-    for (const i of openredList.length) {
+    for (let i = 0; i < openredList.length; i++) {
         $['helptype' + i] = 1
         $['needhelp' + i] = true
         $['canDraw' + i] = false
@@ -62,7 +62,7 @@ if (openredList.length < 1) {
     }
     $.linkid = "yMVR-_QKRd2Mq27xguJG-w"
     //开包 查询
-    for (let i of openredList.length) {
+    for (let i = 0; i < openredList.length; i++) {
         cookie = cookiesArr[i];
         if (cookie) {
             $.index = i + 1;
