@@ -54,10 +54,12 @@ if (openredList.length < 1) {
     }
     console.log("默认为号1开包/助力,号1为作者助力")
     message = ''
+    $.helptype = 1
     for (let i = 0; i < openredList.length; i++) {
-        $['helptype' + i] = 1
         $['needhelp' + i] = true
         $['canDraw' + i] = false
+    }
+    for (let i = 0; i < cookiesArr.length; i++) {
         $['canHelp' + i] = true;
     }
     $.linkid = "yMVR-_QKRd2Mq27xguJG-w"
@@ -81,8 +83,9 @@ if (openredList.length < 1) {
             }
             // await help($.authorid, $.authorinviter, 1, true) //用你开包的号给我助力一次
         }
-        for (let j = 0; j < cookiesArr.length && $['needhelp' + j]; j++) {
-            cookie = cookiesArr[i];
+        for (let j = 0; j < cookiesArr.length && $['needhelp' + i]; j++) {
+            console.log('当前账户' + j + "是否需要助力：", $['needhelp' + i])
+            cookie = cookiesArr[j];
             if (cookie) {
                 $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
                 $.helpindex = j + 1;
