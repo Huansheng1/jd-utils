@@ -84,7 +84,7 @@ if (openredList.length < 1) {
             // await help($.authorid, $.authorinviter, 1, true) //用你开包的号给我助力一次
         }
         for (let j = 0; j < cookiesArr.length && $['needhelp' + i]; j++) {
-            console.log('当前账户' + j + "是否需要助力：", $['needhelp' + i])
+            console.log('当前账户' + i + "是否需要助力：", $['needhelp' + i])
             cookie = cookiesArr[j];
             if (cookie) {
                 $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
