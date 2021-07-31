@@ -155,7 +155,7 @@ function getid (i) {
                     console.log(`${$.name} API请求失败，请检查网路重试`);
                 } else {
                     data = JSON.parse(data);
-                    console.log('获取用户信息：', data)
+                    console.log('获取用户信息：', data.data)
                     if (data.success && data.data) {
                         if (data.data.state === 3) {
                             console.log("今日已成功兑换")
@@ -164,13 +164,15 @@ function getid (i) {
                         } else {
                             if (data.data.state === 6) {
                                 $['needhelp' + i] = false
-                                $['canDraw' + i] = false
                             }
                             console.log(`获取成功redEnvelopeId： ${data.data.redEnvelopeId} \n markPin：${data.data.markedPin}`)
                             $.rid = data.data.redEnvelopeId
                             $.inviter = data.data.markedPin
                         }
-                        console.log(`当前余额：${data.data.amount} 还需 ${data.data.needAmount} `)
+                        if (data.amountEnough == true) {
+                            $['canDraw' + i] = true
+                        }
+                        console.log(`当前余额：${data.data.amount} 还需 ${data.data.needAmount} 是否可兑换：${data.amountEnough}`)
                     } else {
                         console.log(data)
                     }
@@ -231,7 +233,7 @@ function open () {
                     console.log(`${$.name} API请求失败，请检查网路重试`);
                 } else {
                     data = JSON.parse(data);
-                    console.log('开启红包结果：', JSON.stringify(data))
+                    console.log('开启红包结果：', JSON.stringify(data.data.helpResult))
                 }
 
             } catch (e) {
