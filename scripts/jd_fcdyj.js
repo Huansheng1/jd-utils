@@ -81,14 +81,14 @@ if (openredList.length < 1) {
             }
             // await help($.authorid, $.authorinviter, 1, true) //用你开包的号给我助力一次
         }
-        for (let i = 0; i < cookiesArr.length && $['needhelp' + i]; i++) {
+        for (let j = 0; j < cookiesArr.length && $['needhelp' + j]; j++) {
             cookie = cookiesArr[i];
             if (cookie) {
                 $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
-                $.index = i + 1;
-                $.isLogin = true;
-                $.message = `【京东账号${$.index}】${$.UserName}\n`
-                console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
+                $.helpindex = j + 1;
+                $['isLogin' + j] = true;
+                $.message = `【京东账号${$.helpindex}】${$.UserName}\n`
+                console.log(`\n******开始【京东账号${$.helpindex}】${$.nickName || $.UserName}*********\n`);
             }
             if ($.rid && $.inviter && $['needhelp' + i]) {
                 await help($.rid, $.inviter, $.helptype, i)
