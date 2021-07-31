@@ -169,10 +169,10 @@ function getid (i) {
                             $.rid = data.data.redEnvelopeId
                             $.inviter = data.data.markedPin
                         }
-                        if (data.amountEnough == true) {
+                        if (data.data.amountEnough == true) {
                             $['canDraw' + i] = true
                         }
-                        console.log(`当前余额：${data.data.amount} 还需 ${data.data.needAmount} 是否可兑换：${data.amountEnough}`)
+                        console.log(`当前余额：${data.data.amount} 还需 ${data.data.needAmount} 是否可兑换：${data.data.amountEnough}`)
                     } else {
                         console.log(data)
                     }
