@@ -101,7 +101,7 @@ if (openredList.length < 1) {
         }
         console.log(`\n******查询【京东账号${$.index}】红包情况\n`);
         await getid(i)
-        if ($.canDraw) {
+        if ($['canDraw' + i]) {
             console.log("检测到已可兑换，开始兑换：")
             await Draw(i)
             //   i = 999
@@ -155,7 +155,7 @@ function getid (i) {
                     console.log(`${$.name} API请求失败，请检查网路重试`);
                 } else {
                     data = JSON.parse(data);
-                    console.log(data.data.state)
+                    console.log('获取用户信息：', data)
                     if (data.success && data.data) {
                         if (data.data.state === 3) {
                             console.log("今日已成功兑换")
