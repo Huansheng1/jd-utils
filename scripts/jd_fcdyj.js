@@ -59,6 +59,7 @@ console.log('配置环境待助力帐号序号（从1开始）：', process.env.
     for (let i = 0; i < openredList.length; i++) {
         $['needhelp' + i] = true
         $['canDraw' + i] = false
+        $['isBlackAccountOfFCDYJ' + i] = true
     }
     for (let i = 0; i < cookiesArr.length; i++) {
         $['canHelp' + i] = true;
@@ -74,6 +75,10 @@ console.log('配置环境待助力帐号序号（从1开始）：', process.env.
             if (!dyjCode) {
                 console.log(`环境变量中没有检测到助力码,开始获取 账号${$.index} 助力码`)
                 await open(i)
+                console.log(`【京东账号${$.index}】 ${$['isBlackAccountOfFCDYJ' + i] ? '可以' : '不可'}参与活动`)
+                if ($['isBlackAccountOfFCDYJ' + i] === false) {
+                    continue;
+                }
                 await getid(i)
             } else {
                 dyjStr = dyjCode.split("@")
@@ -85,7 +90,7 @@ console.log('配置环境待助力帐号序号（从1开始）：', process.env.
             // await help($.authorid, $.authorinviter, 1, true) //用你开包的号给我助力一次
         }
         for (let j = 0; j < cookiesArr.length && $['needhelp' + i]; j++) {
-            console.log('当前被助力账户' + i + "是否需要助力：", $['needhelp' + i])
+            console.log('当前被助力账户' + $.index + "是否需要助力：", $['needhelp' + i])
             cookie = cookiesArr[j];
             if (cookie) {
                 $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
@@ -225,7 +230,7 @@ function help (rid, inviter, type, i) {
 
 
 
-function open () {
+function open (i) {
     return new Promise(async (resolve) => {
         let options = taskUrl("openRedEnvelopeInteract", `{"linkId":"${$.linkid}"}`)
         $.get(options, async (err, resp, data) => {
@@ -235,7 +240,12 @@ function open () {
                     console.log(`${$.name} API请求失败，请检查网路重试`);
                 } else {
                     data = JSON.parse(data);
-                    console.log('开启红包结果：', JSON.stringify(data.data.helpResult))
+                    try {
+                        console.log('开启红包结果：', JSON.stringify(data.data.helpResult))
+                    } catch (error) {
+                        console.log('当前帐号是黑号，无法开启红包')
+                        $['isBlackAccountOfFCDYJ' + i] = false
+                    }
                 }
 
             } catch (e) {
