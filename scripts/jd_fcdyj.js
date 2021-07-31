@@ -22,7 +22,7 @@ cron "1 0 * * *" script-path=https://raw.githubusercontent.com/jiulan/platypus/m
 const $ = new Env('发财大赢家');
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-const openred = $.isNode() ? (process.env.openred ? process.env.openred : 1) : '1,2,3,4,5' //选择哪个号开包，多个帐号用,隔开
+const openred = $.isNode() ? (process.env.openred ? process.env.openred : '1,2,3,4,5') : '1,2,3,4,5' //选择哪个号开包，多个帐号用,隔开
 const dyjCode = $.isNode() ? (process.env.dyjCode ? process.env.dyjCode : null) : null //选择哪个号开包
 const randomCount = $.isNode() ? 20 : 5;
 const notify = $.isNode() ? require('./sendNotify') : '';
@@ -45,6 +45,7 @@ const openredList = openred.split(',');
 if (openredList.length < 1) {
     openredList = [openred];
 }
+console.log('配置环境待助力帐号序号（从1开始）：', process.env.openred, '实际程序获取到的助力名单：', openredList.join('号 '))
 !(async () => {
     if (!cookiesArr[0]) {
         $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {
@@ -84,7 +85,7 @@ if (openredList.length < 1) {
             // await help($.authorid, $.authorinviter, 1, true) //用你开包的号给我助力一次
         }
         for (let j = 0; j < cookiesArr.length && $['needhelp' + i]; j++) {
-            console.log('当前账户' + i + "是否需要助力：", $['needhelp' + i])
+            console.log('当前被助力账户' + i + "是否需要助力：", $['needhelp' + i])
             cookie = cookiesArr[j];
             if (cookie) {
                 $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
@@ -106,6 +107,8 @@ if (openredList.length < 1) {
             await Draw(i)
             //   i = 999
         }
+        console.log("切换下一个号开始助力（如果有的话）：延时3秒")
+        await $.wait(3000)
     }
 
 })()
@@ -130,7 +133,7 @@ function Draw () {
                 } else {
                     //     console.log(data)
                     data = JSON.parse(data);
-                    console.log("    兑换结果：" + data.errMsg)
+                    console.log("    兑换结果：" + (data.errMsg === 'success' ? '成功' : '失败'))
                     //     $.drawresult = "提现结果：" + data.data.message + "\n"
 
                 }
@@ -155,7 +158,6 @@ function getid (i) {
                     console.log(`${$.name} API请求失败，请检查网路重试`);
                 } else {
                     data = JSON.parse(data);
-                    console.log('获取用户信息：', data.data)
                     if (data.success && data.data) {
                         if (data.data.state === 3) {
                             console.log("今日已成功兑换")
