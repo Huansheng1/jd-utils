@@ -187,90 +187,100 @@ function cashOutQuali () {
         })
     })
 }
-async function userCashOutState (type = true) {
+
+async function userCashOutState(type = true) {
     return new Promise(async (resolve) => {
-        $.get(taskUrl(`user/UserCashOutState`), async (err, resp, data) => {
-            try {
-                if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`${$.name} UserCashOutState API请求失败，请检查网路重试`)
-                } else {
-                    data = JSON.parse(data);
-                    if (type) {
-                        if (data.dwTodayIsCashOut !== 1) {
-                            if (data.ddwUsrTodayGetRich >= data.ddwTodayTargetUnLockRich) {
-                                for (let key of Object.keys(data.UsrCurrCashList).reverse()) {
-                                    let vo = data.UsrCurrCashList[key]
-                                    if (vo.dwDefault === 1) {
-                                        let cashOutRes = await cashOut(vo.ddwMoney, vo.ddwPaperMoney)
-                                        if (cashOutRes.iRet === 0) {
-                                            $.money = vo.ddwMoney / 100
-                                            console.log(`提现成功获得：${$.money}元`)
-                                        } else {
-                                            await userCashOutState()
-                                        }
-                                    }
-                                }
-                            } else {
-                                console.log(`不满足提现条件开始升级建筑`)
-                                //升级建筑
-                                for (let key of Object.keys($.info.buildInfo.buildList)) {
-                                    let vo = $.info.buildInfo.buildList[key]
-                                    let body = `strBuildIndex=${vo.strBuildIndex}`
-                                    let getBuildInfoRes = await getBuildInfo(body, vo)
-                                    let buildNmae;
-                                    switch (vo.strBuildIndex) {
-                                        case 'food':
-                                            buildNmae = '京喜美食城'
-                                            break
-                                        case 'sea':
-                                            buildNmae = '京喜旅馆'
-                                            break
-                                        case 'shop':
-                                            buildNmae = '京喜商店'
-                                            break
-                                        case 'fun':
-                                            buildNmae = '京喜游乐场'
-                                        default:
-                                            break
-                                    }
-                                    console.log(`升级建筑`)
-                                    console.log(`【${buildNmae}】当前等级：${vo.dwLvl} 升级获得财富：${getBuildInfoRes.ddwLvlRich}`)
-                                    console.log(`【${buildNmae}】升级需要${getBuildInfoRes.ddwNextLvlCostCoin}金币，当前拥有${$.info.ddwCoinBalance}`)
-                                    if (getBuildInfoRes.dwCanLvlUp > 0 && $.info.ddwCoinBalance >= getBuildInfoRes.ddwNextLvlCostCoin) {
-                                        console.log(`【${buildNmae}】满足升级条件，开始升级`)
-                                        const body = `ddwCostCoin=${getBuildInfoRes.ddwNextLvlCostCoin}&strBuildIndex=${getBuildInfoRes.strBuildIndex}`
-                                        let buildLvlUpRes = await buildLvlUp(body)
-                                        if (buildLvlUpRes.iRet === 0) {
-                                            console.log(`【${buildNmae}】升级成功\n`)
-                                            break
-                                        } else {
-                                            console.log(`【${buildNmae}】升级失败：${buildLvlUpRes.sErrMsg}\n`)
-                                        }
-                                    } else {
-                                        console.log(`【${buildNmae}】不满足升级条件，跳过升级\n`)
-                                    }
-                                }
-                                let userCashOutStateRes = await userCashOutState(false)
-                                if (userCashOutStateRes.ddwUsrTodayGetRich >= userCashOutStateRes.ddwTodayTargetUnLockRich) {
-                                    await userCashOutState()
-                                } else {
-                                    console.log(`今日还未赚够${userCashOutStateRes.ddwTodayTargetUnLockRich}财富，无法提现`)
-                                }
-                            }
-                        } else {
-                            console.log(`今天已经提现过了~`)
-                        }
+      $.get(taskUrl(`user/UserCashOutState`), async (err, resp, data) => {
+        try {
+          if (err) {
+            console.log(`${JSON.stringify(err)}`)
+            console.log(`${$.name} UserCashOutState API请求失败，请检查网路重试`)
+          } else {
+            data = JSON.parse(data);
+            if (type) {
+              if (data.dwTodayIsCashOut !== 1) {
+                if (data.ddwUsrTodayGetRich >= data.ddwTodayTargetUnLockRich) {
+                  nowTimes = new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000)
+                  if (nowTimes.getHours() >= 0 && nowTimes.getHours() < 12) {
+                    data.UsrCurrCashList = data.UsrCurrCashList.filter((x) => x.ddwMoney / 100 = 1)
+                  } else if (nowTimes.getHours() === 12 && nowTimes.getMinutes() <= 5) {
+                    data.UsrCurrCashList = data.UsrCurrCashList.filter((x) => x.ddwMoney / 100 = 1)
+                  }
+                  for (let key of Object.keys(data.UsrCurrCashList).reverse()) {
+                    let vo = data.UsrCurrCashList[key]
+                    if (vo.dwRemain > 0) {
+                      let cashOutRes = await cashOut(vo.ddwMoney, vo.ddwPaperMoney)
+                      if (cashOutRes.iRet === 0) {
+                        $.money = vo.ddwMoney / 100
+                        console.log(`提现成功：获得${$.money}元`)
+                        break
+                      } else {
+                        console.log(`提现失败：${cashOutRes.sErrMsg}`)
+                        await userCashOutState()
+                      }
+                    } else {
+                      console.log(`提现失败：${vo.ddwMoney / 100}元库存不足`)
                     }
+                  }
+                } else {
+                  console.log(`不满足提现条件开始升级建筑`)
+                  //升级建筑
+                  for(let key of Object.keys($.info.buildInfo.buildList)) {
+                    let vo = $.info.buildInfo.buildList[key]
+                    let body = `strBuildIndex=${vo.strBuildIndex}`
+                    let getBuildInfoRes = await getBuildInfo(body)
+                    let buildNmae;
+                    switch(vo.strBuildIndex) {
+                      case 'food':
+                        buildNmae = '京喜美食城'
+                        break
+                      case 'sea':
+                        buildNmae = '京喜旅馆'
+                        break
+                      case 'shop':
+                        buildNmae = '京喜商店'
+                        break
+                      case 'fun':
+                        buildNmae = '京喜游乐场'
+                      default:
+                        break
+                    }
+                    console.log(`升级建筑`)
+                    console.log(`【${buildNmae}】当前等级：${vo.dwLvl}`)
+                    console.log(`【${buildNmae}】升级需要${getBuildInfoRes.ddwNextLvlCostCoin}金币，当前拥有${$.info.ddwCoinBalance}金币`)
+                    if(getBuildInfoRes.dwCanLvlUp > 0 && $.info.ddwCoinBalance >= getBuildInfoRes.ddwNextLvlCostCoin) {
+                      console.log(`【${buildNmae}】满足升级条件，开始升级`)
+                      const body = `ddwCostCoin=${getBuildInfoRes.ddwNextLvlCostCoin}&strBuildIndex=${getBuildInfoRes.strBuildIndex}`
+                      var buildLvlUpRes = await buildLvlUp(body)
+                      if (buildLvlUpRes.iRet === 0) {
+                        console.log(`【${buildNmae}】升级成功：获得${getBuildInfoRes.ddwLvlRich}财富\n`)
+                        break
+                      } else {
+                        console.log(`【${buildNmae}】升级失败：${buildLvlUpRes.sErrMsg}\n`)
+                      }
+                    } else {
+                      console.log(`【${buildNmae}】不满足升级条件，跳过升级\n`)
+                    }
+                  }
+                  if (buildLvlUpRes.iRet === 0) {
+                    await userCashOutState()
+                  } else {
+                    console.log(`今日还未赚够${userCashOutStateRes.ddwTodayTargetUnLockRich}财富，无法提现`)
+                  }
                 }
-            } catch (e) {
-                $.logErr(e, resp);
-            } finally {
-                resolve(data);
+              } else {
+                console.log(`提现失败：今天已经提现过了~`)
+              }
             }
-        })
+          }
+        } catch (e) {
+          $.logErr(e, resp);
+        } finally {
+          resolve(data);
+        }
+      })
     })
-}
+  }
 function cashOut (ddwMoney, ddwPaperMoney) {
     return new Promise((resolve) => {
         $.get(taskUrl(`user/CashOut`, `ddwMoney=${ddwMoney}&ddwPaperMoney=${ddwPaperMoney}&strPgUUNum=${token['farm_jstoken']}&strPgtimestamp=${token['timestamp']}&strPhoneID=${token['phoneid']}`), (err, resp, data) => {
