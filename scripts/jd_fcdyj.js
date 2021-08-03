@@ -71,8 +71,14 @@ console.log('配置环境待助力帐号序号（从1开始）：', process.env.
         if (cookie) {
             $.index = i + 1;
             console.log(`\n******查询【京东账号${$.index}】红包情况\n`);
-            // await getauthorid()
-            if (!dyjCode) {
+           console.log('获取到的邀请：',dyjCode)
+            try {
+                dyjStr = dyjCode.split("@")
+                if (dyjStr[0]) {
+                    $.rid = dyjStr[0]
+                    $.inviter = dyjStr[1]
+                }
+            } catch (error) {
                 console.log(`环境变量中没有检测到助力码,开始获取 账号${$.index} 助力码`)
                 await open(i)
                 console.log(`【京东账号${$.index}】 ${$['isBlackAccountOfFCDYJ' + i] ? '可以' : '不可'}参与活动`)
@@ -80,12 +86,6 @@ console.log('配置环境待助力帐号序号（从1开始）：', process.env.
                     continue;
                 }
                 await getid(i)
-            } else {
-                dyjStr = dyjCode.split("@")
-                if (dyjStr[0]) {
-                    $.rid = dyjStr[0]
-                    $.inviter = dyjStr[1]
-                }
             }
             // await help($.authorid, $.authorinviter, 1, true) //用你开包的号给我助力一次
         }
