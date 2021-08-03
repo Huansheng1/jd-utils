@@ -1,27 +1,31 @@
 /*
-特物Z|万物皆可国创
+特物Z花西子
 抄自 @yangtingxiao 抽奖机脚本
 活动入口：
 更新地址：https://raw.githubusercontent.com/Wenmoux/scripts/master/jd/jd_superBrand.js
-更新时间：2021-07-6 12:00
-脚本兼容: QuantumultX, Surge,Loon, JSBox, Node.js
-=================================Quantumultx=========================
+已支持IOS双京东账号, Node.js支持N个京东账号
+脚本兼容: QuantumultX, Surge, Loon, 小火箭，JSBox, Node.js
+============Quantumultx===============
 [task_local]
-#特物Z|万物皆可国创
-30 11 * * * https://raw.githubusercontent.com/jiulan/platypus/main/scripts/jd_superBrand.js, tag=特物Z|万物皆可国创, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/jd.png, enabled=true
-=================================Loon===================================
+#特物Z花西子
+30 18,19 * * * https://raw.githubusercontent.com/Wenmoux/scripts/wen/jd/jd_superBrand.js, tag=特物Z花西子, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/jd.png, enabled=true
+
+================Loon==============
 [Script]
-cron "30 11 * * *" script-path=https://raw.githubusercontent.com/jiulan/platypus/main/scripts/jd_superBrand.js,tag=特物Z|万物皆可国创
-===================================Surge================================
-特物Z|万物皆可国创 = type=cron,cronexp="30 11 * * *",wake-system=1,timeout=3600,script-path=https://raw.githubusercontent.com/jiulan/platypus/main/scripts/jd_superBrand.js
-====================================小火箭=============================
-特物Z|万物皆可国创 = type=cron,script-path=https://raw.githubusercontent.com/jiulan/platypus/main/scripts/jd_superBrand.js, cronexpr="30 11 * * *", timeout=3600, enable=true
+cron "30 18 * * *" script-path=https://raw.githubusercontent.com/Wenmoux/scripts/wen/jd/jd_superBrand.js tag=特物Z花西子
+
+===============Surge=================
+特物Z花西子 = type=cron,cronexp="30 18 * * *",wake-system=1,timeout=3600,script-path=https://raw.githubusercontent.com/Wenmoux/scripts/wen/jd/jd_superBrand.js
+
+============小火箭=========
+特物Z花西子 = type=cron,script-path=https://raw.githubusercontent.com/Wenmoux/scripts/wen/jd/jd_superBrand.js, cronexpr="30 18 * * *", timeout=3600, enable=true
+
  */
-const $ = new Env('特物Z|万物皆可国创');
+const $ = new Env('特物Z花西子');
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-const randomCount = $.isNode() ? 20 : 5;
-const Opencardtw= $.isNode() ? (process.env.Opencardtw?process.env.Opencardtw:false):false
+const randomCount = $.isNode() ? 2 : 2;
+const Opencardtw= $.isNode() ? (process.env.Opencardtw?process.env.Opencardtw:true):false
 const notify = $.isNode() ? require('./sendNotify') : '';
 let merge = {}
 let codeList = []
@@ -77,15 +81,15 @@ const JD_API_HOST = `https://api.m.jd.com/client.action`;
                 await getCode("secondfloor", $.actid)
                 if ($.taskList) {
                     for (task of $.taskList) {
-                        if (task.assignmentType == 3) {  //关注店铺
-                            //    console.log(task)
+                        if (task.assignmentType == 3) {  //关注店铺 
+                        //    console.log(task)
                             await doTask("secondfloor", $.enpid, task.encryptAssignmentId, task.ext.followShop[0].itemId, 3)
-                        } else if (task.assignmentType == 0){ // 分享任务
-                            await doTask("secondfloor", $.enpid, task.encryptAssignmentId, null, 0)
-                        }else{
-                            if(Opencardtw){  //领取开卡奖励
-                                await doTask("secondfloor", $.enpid, task.encryptAssignmentId, task.ext.brandMemberList[0].itemId, 7)
-                            }else{console.log("默认不执行开卡任务") }
+                        } else if (task.assignmentType == 0){ // 分享任务 
+                            await doTask("secondfloor", $.enpid, task.encryptAssignmentId, null, 0)             
+                        }else{ 
+                        if(Opencardtw){  //领取开卡奖励
+                            await doTask("secondfloor", $.enpid, task.encryptAssignmentId, task.ext.brandMemberList[0].itemId, 7)
+                        }else{console.log("默认不执行开卡任务") }
                         }
                     }
                 }
@@ -93,9 +97,9 @@ const JD_API_HOST = `https://api.m.jd.com/client.action`;
                 await $.wait(500);
                 await superBrandTaskLottery()
                 await $.wait(1000);
-                //             await doTask("sign", signenpid, signdataeid, 1, 5)
-                //     await $.wait(1000);
-                //   await superBrandTaskLottery("sign", signactid, signenpid, signeid)
+   //             await doTask("sign", signenpid, signdataeid, 1, 5)
+           //     await $.wait(1000);
+             //   await superBrandTaskLottery("sign", signactid, signenpid, signeid)
             }
         }
     }
@@ -114,7 +118,7 @@ const JD_API_HOST = `https://api.m.jd.com/client.action`;
                     l = 9999;
                     console.log("助力次数已满")
                 }else if(code == 103){
-                    codeList.splice(l--, 1) //任务已完成
+                codeList.splice(l--, 1) //任务已完成               
                 }
             }
         }
@@ -133,7 +137,7 @@ const JD_API_HOST = `https://api.m.jd.com/client.action`;
         }
     }
 })()
-    .catch((e) => $.logErr(e))
+.catch((e) => $.logErr(e))
     .finally(() => $.done())
 //获取活动信息
 
@@ -189,7 +193,7 @@ function getCode(source, actid) {
                     if (data && data.data && data.code === "0" && source === "secondfloor") {
                         if (data.data.result && data.data.result.taskList) {
                             $.taskList = data.data.result.taskList.filter(x => x.assignmentType == 3 || x.assignmentType == 7 || x.assignmentType == 0)
-                            //       console.log(data.data.result.taskList)
+                       //       console.log(data.data.result.taskList)
                             let result = data.data.result.taskList.filter(x => x.assignmentType == 2)[0]
                             let encryptAssignmentId = result.encryptAssignmentId
                             let itemid = result.ext.assistTaskDetail.itemId
@@ -201,7 +205,7 @@ function getCode(source, actid) {
                             console.log(data)
                         }
                     } else {
-                        //  console.log(data.data.result)
+                        //  console.log(data.data.result)                       
                     }
                     resolve(data.data.result.taskList)
 
@@ -217,9 +221,9 @@ function getCode(source, actid) {
 
 function doTask(source, pid, encryptAssignmentId, id, type) {
     return new Promise(async (resolve) => {
-        body =  `{"source":"${source}","activityId":${$.actid},"encryptProjectId":"${pid}","encryptAssignmentId":"${encryptAssignmentId}","assignmentType":${type},"itemId":"${id}","actionType":0}`
-        if(type === 0){    body =        `{"source":"${source}","activityId":${$.actid},"encryptProjectId":"${pid}","encryptAssignmentId":"${encryptAssignmentId}","assignmentType":${type},"completionFlag":1,"itemId":"${id}","actionType":0}` }
-        const options = taskPostUrl(`superBrandDoTask`, body)
+            body =  `{"source":"${source}","activityId":${$.actid},"encryptProjectId":"${pid}","encryptAssignmentId":"${encryptAssignmentId}","assignmentType":${type},"itemId":"${id}","actionType":0}`   
+            if(type === 0){    body =        `{"source":"${source}","activityId":${$.actid},"encryptProjectId":"${pid}","encryptAssignmentId":"${encryptAssignmentId}","assignmentType":${type},"completionFlag":1,"itemId":"${id}","actionType":0}` }  
+            const options = taskPostUrl(`superBrandDoTask`, body)
         $.post(options, async (err, resp, data) => {
             try {
                 if (err) {
@@ -268,12 +272,12 @@ function superBrandTaskLottery(source = "secondfloor", actid, enpid, signeid) {
                     data = JSON.parse(data);
                     //   console.log(data)
                     if (data && data.code === "0") {
-                        if (data.data.bizCode === "TK000") {
+                        if (data.data.bizCode === "TK000") {                            
                             let reward = data.data.result.userAwardInfo
                             if(reward&&reward.beanNum){
-                                console.log(`恭喜你 获得 ${reward.beanNum}京🐶`)
+                            console.log(`恭喜你 获得 ${reward.beanNum}京🐶`)                            
                             }else{
-                                console.log(`获得 你猜获得了啥🐶`)
+                            console.log(`获得 你猜获得了啥🐶`)
                             }
                         } else {
                             console.log(data.data.bizMsg)
