@@ -156,15 +156,15 @@ function getUserInfo () {
                             $.grades.push(vo.dwGrade)
                         }
                         console.log(`获取助力码成功：${data.Data.strUserPin}\n`);
-                        if (data.Data['dwCurrentGrade'] >= $.grades[$.grades.length - 1]) {
-                            console.log(`${$.grades[$.grades.length - 1]}个阶梯红包已全部拆完\n`)
-                        } else {
+                        // if (data.Data['dwCurrentGrade'] >= $.grades[$.grades.length - 1]) {
+                        //     console.log(`${$.grades[$.grades.length - 1]}个阶梯红包已全部拆完\n`)
+                        // } else {
                             if (data.Data.strUserPin) {
                                 $.packetIdArr.push({
                                     strUserPin: data.Data.strUserPin,
                                     userName: $.UserName
                                 })
-                            }
+                            // }
                         }
                     } else {
                         console.log(`获取助力码失败：${data.sErrMsg}\n`);

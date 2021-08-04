@@ -60,6 +60,7 @@ console.log('配置环境待助力帐号序号（从1开始）：', process.env.
         $['needhelp' + i] = true
         $['canDraw' + i] = false
         $['isBlackAccountOfFCDYJ' + i] = true
+        $['canWx' + i] = true
     }
     for (let i = 0; i < cookiesArr.length; i++) {
         $['canHelp' + i] = true;
@@ -108,8 +109,13 @@ console.log('配置环境待助力帐号序号（从1开始）：', process.env.
         console.log(`\n******查询【京东账号${$.index}】红包情况\n`);
         await getid(i)
         if ($['canDraw' + i]) {
-            console.log("检测到已可兑换，开始兑换：")
+            await getrewardIndex(i)
+                if ($['canWx' + i]) {
+                    await exchange()
+                }else{
+            console.log("检测到已可兑换红包，开始兑换：")
             await Draw(i)
+                }
             //   i = 999
         }
         console.log("切换下一个号开始助力（如果有的话）：延时3秒")
@@ -124,8 +130,35 @@ console.log('配置环境待助力帐号序号（从1开始）：', process.env.
         $.done();
     })
 
-
-
+    function getrewardIndex(i) {
+        return new Promise(async (resolve) => {
+            let options = taskUrl("rewardIndex", `{"linkId":"${$.linkid}"}`)
+            $.get(options, async (err, resp, data) => {
+                try {
+                    if (err) {
+                        console.log(`${JSON.stringify(err)}`);
+                        console.log(`${$.name} API请求失败，请检查网路重试`);
+                    } else {
+                        data = JSON.parse(data);
+                        if (data.success && data.data) {
+                            if (data.data.haveHelpNum === 10) {
+                                console.log(`\n【京东账号${i}】已满足微信提现要求，开始提现\n`)
+                                $['canWx' + i] = true
+                            }
+                        } else {
+                            console.log(`当前已有 ${data.data.haveHelpNum} 人助力，还需 ${data.data.diffNum} 人`)
+                            $['canWx' + i] = false
+                        }
+                    }
+                } catch (e) {
+                    $.logErr(e, resp);
+                } finally {
+                    resolve();
+                }
+            });
+        });
+    }
+// 红包兑换
 function Draw () {
     return new Promise(async (resolve) => {
         let options = taskUrl("exchange", `{"linkId":"${$.linkid}","rewardType":1}`)
@@ -150,7 +183,31 @@ function Draw () {
         });
     });
 }
-
+// 微信提现
+function exchange() {
+    return new Promise(async (resolve) => {
+        let options = taskUrl("exchange", `{"linkId":"${$.linkid}", "rewardType":2}`)
+        $.get(options, async (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`);
+                    console.log(`${$.name} API请求失败，请检查网路重试`);
+                } else {
+                    data = JSON.parse(data);
+                    if (data.success) {
+                        console.log(`【京东账号${$.index}】提现成功`)
+                    } else {
+                        console.log(`【京东账号${$.index}】提现失败`)
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp);
+            } finally {
+                resolve();
+            }
+        });
+    });
+}
 
 
 function getid (i) {
