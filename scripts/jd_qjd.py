@@ -143,20 +143,9 @@ class getJDCookie(object):
 
     def getckfile(self):
         global v4f
-        curf = pwd + 'JDCookies.txt'
         v4f = '/jd/config/config.sh'
         ql_new = '/ql/config/env.sh'
         ql_old = '/ql/config/cookie.sh'
-        if os.path.exists(curf):
-            with open(curf, "r", encoding="utf-8") as f:
-                cks = f.read()
-                f.close()
-            r = re.compile(r"pt_key=.*?pt_pin=.*?;", re.M | re.S | re.I)
-            cks = r.findall(cks)
-            if len(cks) > 0:
-                return curf
-            else:
-                pass
         if os.path.exists(ql_new):
             print("当前环境青龙面板新版")
             return ql_new
