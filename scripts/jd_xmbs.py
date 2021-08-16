@@ -114,7 +114,7 @@ def main(user, passwd, step):
     login_token = 0
     login_token,userid = login(user,password)
     if login_token == 0:
-        print("登陆失败！")
+        print("登陆失败！：",login_token,userid)
         return "login fail!"
   
     t = get_time()
