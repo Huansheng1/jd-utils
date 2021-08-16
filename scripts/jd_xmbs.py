@@ -5,8 +5,11 @@
 项目名称: 小米刷步数
 Change: Huansheng
 功能：通过小米接口刷微信和支付宝步数。
+cron: 10 10,7 * * *
+Date: 2021/8/17
 京东代挂地址 http://jd.maydays.cn/#/login
-建议cron: 0 16 * * *  python3 smbs.py
+update 2021.8.17
+建议cron: 0 0,7,10 * * *  python3 jd_xmbs.py
 new Env('小米刷步数');
 '''
 
