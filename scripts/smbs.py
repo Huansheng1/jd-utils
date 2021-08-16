@@ -6,7 +6,7 @@
 Change: Huansheng
 功能：通过小米接口刷微信和支付宝步数。
 京东代挂地址 http://jd.maydays.cn/#/login
-建议cron: 0 16 * * *  python3 xmbs.py
+建议cron: 0 16 * * *  python3 smbs.py
 new Env('小米刷步数');
 '''
 
