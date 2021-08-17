@@ -152,14 +152,21 @@ if (process.env.PUSH_PLUS_USER) {
  * @param desp 通知体
  * @param params 某些推送通知方式点击弹窗可跳转, 例：{ url: 'https://abc.com' }
  * @param author 作者仓库等信息  例：`本通知 By：https://github.com/whyour/qinglong`
+ * @param forbidenWord 禁用词，当通知体包含禁用词时将不会发送！
  * @returns {Promise<unknown>}
  */
 async function sendNotify(
   text,
   desp,
   params = {},
-  author = `\n\n【通知】：\n京东代挂：\nhttp://jd.maydays.cn/#/login\n交流群：965286832\n账户大概一个月左右过期需要重新授权\n判断方法：不会加京豆了或者企业微信群提示\n不接受私聊，有问题请在群里交流，不要私下交流，避免骗子！\n京东不要开启免密支付`,
+  author = `\n\n【通知】：\n京东代挂：\nhttp://jd.maydays.cn/\n交流群：965286832\n账户大概一个月左右过期需要重新授权\n判断方法：不会加京豆了或者企业微信群提示\n不接受私聊，有问题请在群里交流，不要私下交流，避免骗子！\n京东不要开启免密支付`,
+  forbidenWord = ['失效','请重新登录','cookie']
 ) {
+    const checkForbidenWord = await forbidenWordCheck(text,desp,forbidenWord);
+    if(checkForbidenWord){
+        // console.log(checkForbidenWord);
+        return checkForbidenWord;
+    }
   //提供6种通知
   desp += author; //增加作者信息，防止被贩卖等
   await Promise.all([
@@ -176,6 +183,14 @@ async function sendNotify(
     qywxamNotify(text, desp), //企业微信应用消息推送
     iGotNotify(text, desp, params), //iGot
   ]);
+}
+function forbidenWordCheck(text,desp,forbidenWord){
+    return new Promise((resolve,reject)=>{
+        if(forbidenWord.some(word=>text.includes(word)||desp.includes(word))){
+            resolve('检测到屏蔽词，停止发送，如需不屏蔽，请手动配置屏蔽关键词！');
+        }
+        resolve(false);
+    });
 }
 
 function serverNotify(text, desp, time = 2100) {
