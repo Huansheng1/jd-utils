@@ -164,7 +164,6 @@ async function sendNotify(
 ) {
     const checkForbidenWord = await forbidenWordCheck(text,desp,forbidenWord);
     if(checkForbidenWord){
-        // console.log(checkForbidenWord);
         return checkForbidenWord;
     }
   //提供6种通知
