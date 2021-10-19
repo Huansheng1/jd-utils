@@ -18,7 +18,7 @@ new Env('小米刷步数');
 # export xm_password=''                  # 密码;
 
 #####
-import json
+
 import os, re, sys
 import random, string,time,json
 try:
@@ -33,12 +33,15 @@ requests.packages.urllib3.disable_warnings()
 
 pwd = os.path.dirname(os.path.abspath(__file__)) + os.sep
 ##############
-global xm_accounts
+global xm_account
+global xm_password
 ckfile = '/ql/config/env.sh'
 try:
-    if "xm_accounts" in os.environ:
-        if len(os.environ["xm_accounts"]) > 2:
-            xm_accounts = json.dumps(os.environ["xm_accounts"])
+    if "JD_COOKIE" in os.environ:
+        if len(os.environ["xm_account"]) > 2:
+            xm_account = os.environ["xm_account"]
+        if len(os.environ["xm_password"]) > 2:
+            xm_password = os.environ["xm_password"]
 except Exception as e:
     print(f"【getCookie Error】{e}")
  
@@ -98,10 +101,6 @@ def login(user,password):
   
 #主函数
 def main(user, passwd, step):
-    for acc in xm_accounts:
-        print("当前账户: %s" % acc)
-        mainPro(acc.account,acc.password,'');
-def mainPro(user, passwd, step):
     user = str(user)
     password = str(passwd)
     step = str(step)
@@ -111,7 +110,7 @@ def mainPro(user, passwd, step):
      
     if step == '':
         print ("已设置为随机步数（24000-25000）")
-        step = str(random.randint(20000,24000))
+        step = str(random.randint(16000,16500))
     login_token = 0
     login_token,userid = login(user,password)
     if login_token == 0:
@@ -371,4 +370,3 @@ if __name__ ==  "__main__":
             pass
     else:
         print('用户名和密码数量不对')
-    
