@@ -37,7 +37,7 @@ global xm_account
 global xm_password
 ckfile = '/ql/config/env.sh'
 try:
-    if "JD_COOKIE" in os.environ:
+    if "xm_account" in os.environ:
         if len(os.environ["xm_account"]) > 2:
             xm_account = os.environ["xm_account"]
         if len(os.environ["xm_password"]) > 2:
@@ -110,7 +110,7 @@ def main(user, passwd, step):
      
     if step == '':
         print ("已设置为随机步数（24000-25000）")
-        step = str(random.randint(16000,16500))
+        step = str(random.randint(20000,24000))
     login_token = 0
     login_token,userid = login(user,password)
     if login_token == 0:
